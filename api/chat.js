@@ -2,24 +2,15 @@ export default async function handler(req, res) {
 
   try {
 
-    const text =
-      req.query.text ||
-      req.body?.text ||
-      "שלום";
+    const text = req.query.text || "שלום";
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + process.env.GEMINI_KEY,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text }]
-            }
-          ]
+          contents: [{ parts: [{ text }] }]
         })
       }
     );
@@ -30,15 +21,13 @@ export default async function handler(req, res) {
       data.candidates?.[0]?.content?.parts?.[0]?.text ||
       "לא התקבלה תשובה";
 
-    res.status(200).json({
-      response: reply.substring(0, 400)
-    });
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.send("id_list_message=t-" + reply.substring(0,400));
 
-  } catch (err) {
+  } catch (e) {
 
-    res.status(200).json({
-      response: "אירעה שגיאה זמנית"
-    });
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.send("id_list_message=t-אירעה שגיאה זמנית");
 
   }
 }
